@@ -62,7 +62,7 @@ const transformUser = (jsonUser: any): User => {
     firstName: firstName,
     lastName: lastName,
     maidenName: '',
-    age: 25 + (jsonUser.id % 40), // Mock age
+    age: 25 + (jsonUser.id % 40),
     gender: jsonUser.id % 2 === 0 ? 'male' : 'female',
     email: jsonUser.email,
     phone: jsonUser.phone,
@@ -129,10 +129,8 @@ const transformUser = (jsonUser: any): User => {
   };
 };
 
-export const fetchUsers = async (
-  limit: number = 100,
-  skip: number = 0
-): Promise<UsersResponse> => {
+
+export const fetchUsers = async (): Promise<UsersResponse> => {
   const response = await fetchAPI(`${BASE_URL}/users`);
   const data = await response.json();
   const transformedUsers = data.map(transformUser);

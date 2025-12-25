@@ -34,13 +34,14 @@ const HomePage: React.FC<HomePageProps> = ({ onUserSelect }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
-  const { data, isLoading, error } = useQuery<UsersResponse>({
-    queryKey: ['users'],
-    queryFn: () => fetchUsers(100, 0),
-    staleTime: 5 * 60 * 1000,
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
-  });
+
+const { data, isLoading, error } = useQuery<UsersResponse>({
+  queryKey: ['users'],
+  queryFn: fetchUsers, 
+  staleTime: 5 * 60 * 1000,
+  retry: 2,
+  retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
+});
 
   const filtered = useMemo(() => {
     if (!data?.users) return [];
