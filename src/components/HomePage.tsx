@@ -119,9 +119,9 @@ const { data, isLoading, error } = useQuery<UsersResponse>({
             placeholder="Tanlang"
             leftSection={<IconFilter size={14} />}
             data={[
-              { value: 'all', label: 'Barcha' },
-              { value: 'male', label: 'Erkaklar' },
-              { value: 'female', label: 'Ayollar' },
+              { value: 'all', label: 'All' },
+              { value: 'male', label: 'Man' },
+              { value: 'female', label: 'Woman' },
             ]}
             value={genderFilter}
             onChange={(value) => {
