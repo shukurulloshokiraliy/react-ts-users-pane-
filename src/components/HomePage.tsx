@@ -19,7 +19,7 @@ import {
   Box,
   Image,
 } from '@mantine/core';
-import { IconSearch, IconUsers, IconFilter, IconMail, IconPhone, IconMapPin } from '@tabler/icons-react';
+import { IconSearch, IconUsers, IconFilter, IconMail, IconPhone, IconMapPin, IconSortAscending } from '@tabler/icons-react';
 import { fetchUsers } from '../API';
 import type { UsersResponse, User } from '../types';
 import logo from '../assets/images/logo.png';
@@ -31,27 +31,41 @@ interface HomePageProps {
 const HomePage: React.FC<HomePageProps> = ({ onUserSelect }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [genderFilter, setGenderFilter] = useState<string | null>('all');
+  const [sortOrder, setSortOrder] = useState<string | null>('default');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
-
-const { data, isLoading, error } = useQuery<UsersResponse>({
-  queryKey: ['users'],
-  queryFn: fetchUsers, 
-  staleTime: 5 * 60 * 1000,
-  retry: 2,
-  retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
-});
+  const { data, isLoading, error } = useQuery<UsersResponse>({
+    queryKey: ['users'],
+    queryFn: fetchUsers, 
+    staleTime: 5 * 60 * 1000,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
+  });
 
   const filtered = useMemo(() => {
     if (!data?.users) return [];
-    return data.users.filter((user: User) => {
+    
+    let result = data.users.filter((user: User) => {
       const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
       const matchesSearch = fullName.includes(searchTerm.toLowerCase());
       const matchesGender = genderFilter === 'all' || user.gender === genderFilter;
       return matchesSearch && matchesGender;
     });
-  }, [data?.users, searchTerm, genderFilter]);
+
+   
+    if (sortOrder === 'a-z') {
+      result = [...result].sort((a, b) => 
+        `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
+      );
+    } else if (sortOrder === 'z-a') {
+      result = [...result].sort((a, b) => 
+        `${b.firstName} ${b.lastName}`.localeCompare(`${a.firstName} ${a.lastName}`)
+      );
+    }
+
+    return result;
+  }, [data?.users, searchTerm, genderFilter, sortOrder]);
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const paginatedUsers = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -131,6 +145,25 @@ const { data, isLoading, error } = useQuery<UsersResponse>({
             w={140}
             radius="md"
             size="sm"
+          />
+          <Select
+            label="Sort"
+            placeholder="Tanlang"
+            leftSection={<IconSortAscending size={14} />}
+            data={[
+              { value: 'default', label: 'Default' },
+              { value: 'a-z', label: 'A-Z' },
+              { value: 'z-a', label: 'Z-A' },
+            ]}
+            value={sortOrder}
+            onChange={(value) => {
+              setSortOrder(value);
+              setCurrentPage(1);
+            }}
+            w={140}
+            radius="md"
+            size="sm"
+            clearable
           />
         </Group>
         {(searchTerm || genderFilter !== 'all') && (
