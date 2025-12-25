@@ -1,3 +1,4 @@
+// types.ts
 
 export interface Coordinates {
   lat: number;
@@ -73,26 +74,6 @@ export interface User {
 
 export interface UsersResponse {
   users: User[];
-  total: number;
-  skip: number;
-  limit: number;
-}
-
-export interface IBaseResponse<T> {
-  status: number;
-  statusText: string;
-  data: T;
-}
-
-export interface ITodo {
-  id: number;
-  todo: string;
-  completed: boolean;
-  userId: number;
-}
-
-export interface TodosResponse {
-  todos: ITodo[];
   total: number;
   skip: number;
   limit: number;

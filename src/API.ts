@@ -1,66 +1,19 @@
 // API.ts
-import type { User, UsersResponse, TodosResponse } from './types';
+import axios from 'axios';
+import type { User, UsersResponse } from './types';
 
-const BASE_URL = 'https://jsonplaceholder.typicode.com';
-
-
-const fetchWithTimeout = async (url: string, timeout: number = 8000): Promise<Response> => {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-  try {
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    clearTimeout(timeoutId);
-    return response;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    throw error;
-  }
-};
-
-
-const fetchAPI = async (url: string, retries: number = 2): Promise<Response> => {
-  let lastError: Error | null = null;
-
-  for (let i = 0; i <= retries; i++) {
-    try {
-      const response = await fetchWithTimeout(url);
-
-      if (!response.ok) {
-        throw new Error(`HTTP xatolik: ${response.status}`);
-      }
-
-      return response;
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error('Noma\'lum xatolik');
-      
-      if (i === retries) {
-        throw lastError;
-      }
-
-      const delay = Math.min(1000 * Math.pow(2, i), 3000);
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-  }
-
-  throw lastError || new Error('Fetch muvaffaqiyatsiz');
-};
-
+const api = axios.create({
+  baseURL: 'https://jsonplaceholder.typicode.com',
+  timeout: 8000,
+});
 
 const transformUser = (jsonUser: any): User => {
-  const nameParts = jsonUser.name.split(' ');
-  const firstName = nameParts[0] || 'User';
-  const lastName = nameParts.slice(1).join(' ') || 'Name';
-
+  const [firstName, ...lastNameParts] = jsonUser.name.split(' ');
+  
   return {
     id: jsonUser.id,
-    firstName: firstName,
-    lastName: lastName,
+    firstName: firstName || 'User',
+    lastName: lastNameParts.join(' ') || 'Name',
     maidenName: '',
     age: 25 + (jsonUser.id % 40),
     gender: jsonUser.id % 2 === 0 ? 'male' : 'female',
@@ -120,19 +73,13 @@ const transformUser = (jsonUser: any): User => {
     ein: '',
     ssn: '',
     userAgent: '',
-    crypto: {
-      coin: 'Bitcoin',
-      wallet: '',
-      network: '',
-    },
+    crypto: { coin: 'Bitcoin', wallet: '', network: '' },
     role: 'user',
   };
 };
 
-
 export const fetchUsers = async (): Promise<UsersResponse> => {
-  const response = await fetchAPI(`${BASE_URL}/users`);
-  const data = await response.json();
+  const { data } = await api.get('/users');
   const transformedUsers = data.map(transformUser);
   
   return {
@@ -143,75 +90,7 @@ export const fetchUsers = async (): Promise<UsersResponse> => {
   };
 };
 
-
 export const fetchUserById = async (id: number): Promise<User> => {
-  const response = await fetchAPI(`${BASE_URL}/users/${id}`);
-  const data = await response.json();
+  const { data } = await api.get(`/users/${id}`);
   return transformUser(data);
-};
-
-
-export const searchUsers = async (query: string): Promise<UsersResponse> => {
-  const response = await fetchAPI(`${BASE_URL}/users`);
-  const data = await response.json();
-  const filtered = data.filter((user: any) =>
-    user.name.toLowerCase().includes(query.toLowerCase()) ||
-    user.username.toLowerCase().includes(query.toLowerCase()) ||
-    user.email.toLowerCase().includes(query.toLowerCase())
-  );
-  const transformedUsers = filtered.map(transformUser);
-  
-  return {
-    users: transformedUsers,
-    total: transformedUsers.length,
-    skip: 0,
-    limit: transformedUsers.length,
-  };
-};
-
-
-export const fetchUserTodos = async (userId: number): Promise<TodosResponse> => {
-  const response = await fetchAPI(`${BASE_URL}/users/${userId}/todos`);
-  const data = await response.json();
-  const transformedTodos = data.map((todo: any) => ({
-    id: todo.id,
-    todo: todo.title,
-    completed: todo.completed,
-    userId: todo.userId,
-  }));
-  
-  return {
-    todos: transformedTodos,
-    total: transformedTodos.length,
-    skip: 0,
-    limit: transformedTodos.length,
-  };
-};
-
-
-export const getUserFullName = (user: User): string => {
-  return `${user.firstName} ${user.lastName}`;
-};
-
-export const getUserFullAddress = (user: User): string => {
-  const { address, city, state, postalCode, country } = user.address;
-  return `${address}, ${city}, ${state} ${postalCode}, ${country}`;
-};
-
-export const formatUserData = (user: User) => {
-  return {
-    id: user.id,
-    ism: getUserFullName(user),
-    yosh: user.age,
-    email: user.email,
-    telefon: user.phone,
-    manzil: getUserFullAddress(user),
-    jins: user.gender === 'male' ? 'Erkak' : 'Ayol',
-    tug_kun: new Date(user.birthDate).toLocaleDateString('uz-UZ'),
-    soch: `${user.hair.color} (${user.hair.type})`,
-    qonGuruhi: user.bloodGroup,
-    kompaniya: user.company.name,
-    lavozim: user.company.title,
-    universitet: user.university,
-  };
 };

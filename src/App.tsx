@@ -1,53 +1,31 @@
-import React, { useState } from 'react';
+// App.tsx
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MantineProvider } from '@mantine/core';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HomePage from './components/HomePage';
+import UserDetail from './components/UserDetail';
 import '@mantine/core/styles.css';
 import './index.css';
-import UserDetail from './components/UserDetail';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      retry: 2,
       refetchOnWindowFocus: false,
     },
   },
 });
 
-interface AppState {
-  page: 'home' | 'detail';
-  selectedUserId: number | null;
-}
-
-const App: React.FC = () => {
-  const [appState, setAppState] = useState<AppState>({
-    page: 'home',
-    selectedUserId: null,
-  });
-
-  const handleUserSelect = (userId: number): void => {
-    setAppState({
-      page: 'detail',
-      selectedUserId: userId,
-    });
-  };
-
-  const handleBack = (): void => {
-    setAppState({
-      page: 'home',
-      selectedUserId: null,
-    });
-  };
-
+const App = () => {
   return (
     <MantineProvider>
       <QueryClientProvider client={queryClient}>
-        {appState.page === 'home' ? (
-          <HomePage onUserSelect={handleUserSelect} />
-        ) : (
-          <UserDetail userId={appState.selectedUserId!} onBack={handleBack} />
-        )}
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/user/:id" element={<UserDetail />} />
+          </Routes>
+        </BrowserRouter>
       </QueryClientProvider>
     </MantineProvider>
   );
