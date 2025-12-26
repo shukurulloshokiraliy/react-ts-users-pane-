@@ -1,3 +1,4 @@
+// HomePage.tsx 
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -42,6 +43,7 @@ const HomePage: React.FC = () => {
     );
   }, [users, query]);
 
+  const total = Math.ceil(filtered.length / 12);
 
   const items = useMemo(() => {
     return filtered.slice((page - 1) * 12, page * 12);
@@ -62,7 +64,7 @@ const HomePage: React.FC = () => {
 
   return (
     <Container size="xl" py="xl">
-      <Paper  p="lg" mb="lg">
+      <Paper p="lg" mb="lg">
         <Group justify="center">
           <Image src={logo} alt="logo" w={100} h={100} radius="xl" />
         </Group>
@@ -87,7 +89,6 @@ const HomePage: React.FC = () => {
         {items.map((user: User) => (
           <Grid.Col key={user.id} span={{ base: 12, sm: 6, md: 3 }}>
             <Card
-              
               p="xl"
               withBorder
               role="button"
@@ -111,16 +112,16 @@ const HomePage: React.FC = () => {
                     {user.firstName} {user.lastName}
                   </Text>
                   <Text size="sm" c="dimmed" ta="center">
-                  Nick:  @{user.username}
+                    Nick: @{user.username}
                   </Text>
                 </Box>
                 <Stack gap={6}>
-                  <Text size="sm"> Email:{user.email}</Text>
+                  <Text size="sm">Email: {user.email}</Text>
                   <Text size="sm" c="dimmed">
-                   Number: {user.phone}
+                    Number: {user.phone}
                   </Text>
                   <Text size="sm" c="dimmed">
-                  Address:  {user.address.city}
+                    Address: {user.address.city}
                   </Text>
                 </Stack>
               </Stack>
@@ -129,7 +130,11 @@ const HomePage: React.FC = () => {
         ))}
       </Grid>
 
-  
+      {total > 1 && (
+        <Center mt="xl">
+          <Pagination value={page} onChange={setPage} total={total} color="green" />
+        </Center>
+      )}
     </Container>
   );
 };

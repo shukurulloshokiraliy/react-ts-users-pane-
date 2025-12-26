@@ -1,3 +1,4 @@
+// UserDetail.tsx
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -5,66 +6,89 @@ import {
   Container,
   Paper,
   Text,
-  Stack,
-  Loader,
-  Center,
-  Button,
-  Box,
   Image,
+  Stack,
+  Group,
+  Button,
+  Center,
+  Loader,
+  Box,
 } from '@mantine/core';
 import { fetchUserById } from '../API';
 import type { User } from '../types';
-import avatarka from '../assets/images/ava1.png';
+import avatarka from '../assets/images/avatarka.jpg';
 
 const UserDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   const { data: user, isLoading } = useQuery<User>({
-    queryKey: ['user', Number(id)],
+    queryKey: ['user', id],
     queryFn: () => fetchUserById(Number(id)),
     staleTime: 300000,
   });
 
-  if (isLoading) return <Center h="100vh"><Loader size="xl" color="green" /></Center>;
-  if (!user) return <Center h="100vh"><Text>User not found</Text></Center>;
+  if (isLoading) {
+    return (
+      <Center h="100vh">
+        <Loader size="xl" color="green" />
+      </Center>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Center h="100vh">
+        <Text>User not found</Text>
+      </Center>
+    );
+  }
 
   return (
     <Container size="sm" py="xl">
-      <Button color="green" onClick={() => navigate('/')} mb="lg">Back</Button>
+      <Paper shadow="md" p="xl" withBorder>
+        <Stack gap="lg">
+          <Center>
+            <Image src={avatarka} alt="Avatar" w={150} h={150} radius="xl" />
+          </Center>
 
-      <Paper shadow="md" p="xl" radius="md" >
-        <Stack gap="lg" align="center">
-          <Image src={avatarka} alt="Avatar" w={100} h={100} radius="xl" bg="green" />
-          
-          <Box ta="center">
-            <Text component="h1" size="xl" fw={700} c="green">
+          <Box>
+            <Text size="xl" fw={700} ta="center" c="green">
               {user.firstName} {user.lastName}
             </Text>
-            <Text c="dimmed">@{user.username}</Text>
+            <Text size="md" c="dimmed" ta="center">
+              @{user.username}
+            </Text>
           </Box>
 
-          <Stack gap="sm" w="100%">
-            <Box>
-              <Text size="xs" c="dimmed">Email</Text>
-              <Text fw={500}>{user.email}</Text>
-            </Box>
-
-            <Box>
-              <Text size="xs" c="dimmed">Phone</Text>
-              <Text fw={500}>{user.phone}</Text>
-            </Box>
-
-            <Box>
-              <Text size="xs" c="dimmed">City</Text>
-              <Text fw={500}>{user.address.city}</Text>
-            </Box>
-
-            <Box>
-              <Text size="xs" c="dimmed">Company</Text>
-              <Text fw={500}>{user.company.name}</Text>
-            </Box>
+          <Stack gap="xs">
+            <Group>
+              <Text fw={600}>Email:</Text>
+              <Text>{user.email}</Text>
+            </Group>
+            <Group>
+              <Text fw={600}>Phone:</Text>
+              <Text>{user.phone}</Text>
+            </Group>
+            <Group>
+              <Text fw={600}>Website:</Text>
+              <Text>{user.website}</Text>
+            </Group>
+            <Group>
+              <Text fw={600}>Address:</Text>
+              <Text>
+                {user.address.street}, {user.address.city}
+              </Text>
+            </Group>
+            <Group>
+              <Text fw={600}>Company:</Text>
+              <Text>{user.company.name}</Text>
+            </Group>
           </Stack>
+
+          <Button color="green" fullWidth onClick={() => navigate('/')}>
+            Back to Home
+          </Button>
         </Stack>
       </Paper>
     </Container>
