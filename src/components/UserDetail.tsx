@@ -33,7 +33,7 @@ const UserDetail: React.FC = () => {
     <Container size="sm" py="xl">
       <Button color="green" onClick={() => navigate('/')} mb="lg">Back</Button>
 
-      <Paper shadow="md" p="xl" radius="md">
+      <Paper shadow="md" p="xl" radius="md" >
         <Stack gap="lg" align="center">
           <Image src={avatarka} alt="Avatar" w={100} h={100} radius="xl" bg="green" />
           

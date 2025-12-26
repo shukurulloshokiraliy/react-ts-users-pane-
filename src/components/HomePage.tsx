@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -34,47 +34,74 @@ const HomePage: React.FC = () => {
     staleTime: 300000,
   });
 
-  const users = data?.users || [];
-  const filtered = users.filter(u => 
-    `${u.firstName} ${u.lastName}`.toLowerCase().includes(query.toLowerCase())
-  );
+  const users = data?.users ?? [];
 
-  const total = Math.ceil(filtered.length / 12);
-  const items = filtered.slice((page - 1) * 12, page * 12);
+  const filtered = useMemo(() => {
+    return users.filter(u =>
+      `${u.firstName} ${u.lastName}`.toLowerCase().includes(query.toLowerCase())
+    );
+  }, [users, query]);
+
+
+  const items = useMemo(() => {
+    return filtered.slice((page - 1) * 12, page * 12);
+  }, [filtered, page]);
 
   const handleSearch = () => {
     setQuery(search);
     setPage(1);
   };
 
-  if (isLoading) return <Center h="100vh"><Loader size="xl" color="green" /></Center>;
+  if (isLoading) {
+    return (
+      <Center h="100vh">
+        <Loader size="xl" color="green" />
+      </Center>
+    );
+  }
 
   return (
     <Container size="xl" py="xl">
-     <Paper shadow="sm" p="lg" mb="lg">
-  <Group justify="center" >
-    <Image src={logo} alt="logo" w={100} h={100} radius="xl" />
-  </Group>
-</Paper>
+      <Paper  p="lg" mb="lg">
+        <Group justify="center">
+          <Image src={logo} alt="logo" w={100} h={100} radius="xl" />
+        </Group>
+      </Paper>
 
       <Paper shadow="sm" p="md" mb="lg">
         <Group>
           <TextInput
-            placeholder="Search users..."
+            placeholder="Search users name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             style={{ flex: 1 }}
           />
-          <Button color="green" onClick={handleSearch}>Search</Button>
+          <Button color="green" onClick={handleSearch}>
+            Search
+          </Button>
         </Group>
       </Paper>
 
       <Grid mb="lg">
         {items.map((user: User) => (
-          <Grid.Col key={user.id} span={{ base: 12, sm: 6, md: 4 }}>
-            <Card shadow="sm" p="lg" withBorder onClick={() => navigate(`/user/${user.id}`)} 
-              style={{ cursor: 'pointer' }}>
+          <Grid.Col key={user.id} span={{ base: 12, sm: 6, md: 3 }}>
+            <Card
+              
+              p="xl"
+              withBorder
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate(`/user/${user.id}`)}
+              onKeyDown={(e) =>
+                e.key === 'Enter' && navigate(`/user/${user.id}`)
+              }
+              style={{
+                cursor: 'pointer',
+                borderColor: 'var(--mantine-color-green-5)',
+                transition: '0.2s',
+              }}
+            >
               <Stack gap="md">
                 <Center>
                   <Image src={avatarka} alt="Avatar" w={80} h={80} radius="xl" />
@@ -83,12 +110,18 @@ const HomePage: React.FC = () => {
                   <Text component="h2" size="lg" fw={600} ta="center" c="green">
                     {user.firstName} {user.lastName}
                   </Text>
-                  <Text size="sm" c="dimmed" ta="center">@{user.username}</Text>
+                  <Text size="sm" c="dimmed" ta="center">
+                  Nick:  @{user.username}
+                  </Text>
                 </Box>
                 <Stack gap={6}>
-                  <Text size="sm">{user.email}</Text>
-                  <Text size="sm" c="dimmed">{user.phone}</Text>
-                  <Text size="sm" c="dimmed">{user.address.city}</Text>
+                  <Text size="sm"> Email:{user.email}</Text>
+                  <Text size="sm" c="dimmed">
+                   Number: {user.phone}
+                  </Text>
+                  <Text size="sm" c="dimmed">
+                  Address:  {user.address.city}
+                  </Text>
                 </Stack>
               </Stack>
             </Card>
@@ -96,11 +129,7 @@ const HomePage: React.FC = () => {
         ))}
       </Grid>
 
-      {total > 1 && (
-        <Center>
-          <Pagination value={page} onChange={setPage} total={total} color="green" />
-        </Center>
-      )}
+  
     </Container>
   );
 };
