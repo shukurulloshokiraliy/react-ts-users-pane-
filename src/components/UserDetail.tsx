@@ -85,10 +85,20 @@ const UserDetail: React.FC = () => {
               <Text>{user.company.name}</Text>
             </Group>
           </Stack>
+<Center>
+  <Button
+    color="green"
+    fullWidth
+    radius="lg"
+    h={40}
+    w={250}
+    onClick={() => navigate('/')}
+  >
+    Back to Home
+  </Button>
+</Center>
 
-          <Button color="green" fullWidth onClick={() => navigate('/')}>
-            Back to Home
-          </Button>
+
         </Stack>
       </Paper>
     </Container>

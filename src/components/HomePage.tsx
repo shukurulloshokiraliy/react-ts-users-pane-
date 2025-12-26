@@ -64,13 +64,13 @@ const HomePage: React.FC = () => {
 
   return (
     <Container size="xl" py="xl">
-      <Paper p="lg" mb="lg">
+      <Paper p="sm" mb="lg">
         <Group justify="center">
-          <Image src={logo} alt="logo" w={100} h={100} radius="xl" />
+          <Image src={logo} alt="logo" w={150} h={150} radius="xl" />
         </Group>
       </Paper>
 
-      <Paper shadow="sm" p="md" mb="lg">
+      <Paper shadow="sm" p="md" mb="lg" w={800} mx="auto"  >
         <Group>
           <TextInput
             placeholder="Search users name..."
@@ -115,7 +115,7 @@ const HomePage: React.FC = () => {
                     Nick: @{user.username}
                   </Text>
                 </Box>
-                <Stack gap={6}>
+                <Stack gap={8}>
                   <Text size="sm">Email: {user.email}</Text>
                   <Text size="sm" c="dimmed">
                     Number: {user.phone}
