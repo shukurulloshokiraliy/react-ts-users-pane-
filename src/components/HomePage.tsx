@@ -20,7 +20,7 @@ import {
 } from '@mantine/core';
 import { fetchUsers } from '../API';
 import type { UsersResponse, User } from '../types';
-import avatarka from '../assets/images/avatarka.jpg';
+import avatarka from '../assets/images/ava01.jpg';
 import logo from '../assets/images/logo.png';
 
 const HomePage: React.FC = () => {

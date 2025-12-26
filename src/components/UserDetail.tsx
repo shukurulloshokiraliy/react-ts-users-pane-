@@ -16,7 +16,7 @@ import {
 } from '@mantine/core';
 import { fetchUserById } from '../API';
 import type { User } from '../types';
-import avatarka from '../assets/images/avatarka.jpg';
+import avatarka from '../assets/images/ava1.png';
 
 const UserDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -57,7 +57,7 @@ const UserDetail: React.FC = () => {
               {user.firstName} {user.lastName}
             </Text>
             <Text size="md" c="dimmed" ta="center">
-              @{user.username}
+            Nick:  @{user.username}
             </Text>
           </Box>
 
